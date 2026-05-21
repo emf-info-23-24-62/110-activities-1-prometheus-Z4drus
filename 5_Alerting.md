@@ -164,20 +164,46 @@ Créer des règles d'alertes qui détectent :
 
 **Réponse :**
 
-    (votre configuration ici)
+```yaml
+- alert: HighCpuUsage
+  expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+  for: 2m
+  labels:
+    severity: warning
+  annotations:
+    summary: "CPU élevé sur {{ $labels.instance }}"
+    description: "Utilisation CPU > 80% pendant 2 min (valeur courante: {{ $value | printf \"%.1f\" }}%)."
+```
 
-   
  - Mémoire élevée
 
 **Réponse :**
 
-    (votre configuration ici)
+```yaml
+- alert: HighMemoryUsage
+  expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+  for: 2m
+  labels:
+    severity: warning
+  annotations:
+    summary: "Mémoire élevée sur {{ $labels.instance }}"
+    description: "RAM utilisée > 85% pendant 2 min (valeur courante: {{ $value | printf \"%.1f\" }}%)."
+```
 
  - Disk usage élevé
 
 **Réponse :**
 
-    (votre configuration ici)
+```yaml
+- alert: HighDiskUsage
+  expr: (1 - (node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|fuse.lxcfs"} / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|fuse.lxcfs"})) * 100 > 85
+  for: 5m
+  labels:
+    severity: warning
+  annotations:
+    summary: "Disque / saturé sur {{ $labels.instance }}"
+    description: "Occupation / > 85% pendant 5 min (valeur courante: {{ $value | printf \"%.1f\" }}%)."
+```
 
 
 
